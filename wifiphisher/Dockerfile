@@ -25,19 +25,20 @@ RUN set -eux; \
     "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6ARCH}.tar.xz"; \
   tar -C / -Jxpf /tmp/s6-noarch.tar.xz; \
   tar -C / -Jxpf /tmp/s6-arch.tar.xz; \
-  rm -f /tmp/s6-noarch.tar.xz /tmp/s6-arch.tar.xz
+  rm -f /tmp/s6-noarch.tar.xz /tmp/s6-arch.tar.xz; \
+  test -x /init
 
-# Install wifiphisher
+# Clone + install wifiphisher (IMPORTANT: cd into repo before pip install)
 WORKDIR /opt
 RUN git clone https://github.com/wifiphisher/wifiphisher.git /opt/wifiphisher \
+  && cd /opt/wifiphisher \
   && pip3 install --break-system-packages .
 
-# Copy service files
-COPY rootfs/ /etc/
+# Copy s6 services to the right place
+COPY rootfs/ /
 
-# IMPORTANT: make service executable
+# Ensure service scripts are executable
 RUN chmod +x /etc/services.d/wifiphisher/run \
     && chmod +x /etc/services.d/wifiphisher/finish
 
-# Start s6
 CMD ["/init"]
