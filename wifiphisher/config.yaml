@@ -1,0 +1,19 @@
+name: "Wifiphisher"
+version: "1.0.0"
+slug: "wifiphisher"
+description: "Wifiphisher Add-on (nur legale Testumgebungen)"
+arch:
+  - amd64
+  - aarch64
+startup: services
+boot: auto
+host_network: true
+privileged:
+  - NET_ADMIN
+  - NET_RAW
+options:
+  interface: "wlan0"
+  args: ""
+schema:
+  interface: str
+  args: str

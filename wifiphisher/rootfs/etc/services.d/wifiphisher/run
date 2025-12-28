@@ -1,0 +1,17 @@
+#!/usr/bin/with-contenv bash
+set -euo pipefail
+
+OPTIONS="/data/options.json"
+IFACE="wlan0"
+EXTRA_ARGS=""
+
+if [ -f "$OPTIONS" ]; then
+  IFACE="$(jq -r '.interface // "wlan0"' "$OPTIONS")"
+  EXTRA_ARGS="$(jq -r '.args // ""' "$OPTIONS")"
+fi
+
+echo "[wifiphisher] interface=$IFACE"
+echo "[wifiphisher] args=$EXTRA_ARGS"
+
+read -r -a EXTRA_ARR <<< "${EXTRA_ARGS:-}"
+exec wifiphisher --interface "$IFACE" "${EXTRA_ARR[@]}"
