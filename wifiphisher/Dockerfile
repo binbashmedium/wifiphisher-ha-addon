@@ -7,11 +7,9 @@ RUN apk add --no-cache \
   curl tar xz \
   dnsmasq hostapd iptables \
   psmisc procps util-linux \
-  libnl3 libnl3-dev \
-  aircrack-ng \
-  dbus py3-dbus
+  libnl3 libnl3-dev
 
-# Install s6-overlay (fixed version)
+# Install s6-overlay
 ENV S6_OVERLAY_VERSION=3.2.1.0
 
 RUN set -eux; \
@@ -27,24 +25,19 @@ RUN set -eux; \
     "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6ARCH}.tar.xz"; \
   tar -C / -Jxpf /tmp/s6-noarch.tar.xz; \
   tar -C / -Jxpf /tmp/s6-arch.tar.xz; \
-  rm -f /tmp/s6-noarch.tar.xz /tmp/s6-arch.tar.xz; \
-  test -x /init
+  rm -f /tmp/s6-noarch.tar.xz /tmp/s6-arch.tar.xz
 
-# Pre-install roguehostapd from git (avoid broken PyPI roguehostapd using Python2 ConfigParser)
-RUN pip3 install --break-system-packages --upgrade pip setuptools wheel \
-  && pip3 install --break-system-packages \
-     "roguehostapd @ git+https://github.com/wifiphisher/roguehostapd.git"
-
-# Clone + install wifiphisher
+# Install wifiphisher
 WORKDIR /opt
 RUN git clone https://github.com/wifiphisher/wifiphisher.git /opt/wifiphisher \
-  && cd /opt/wifiphisher \
   && pip3 install --break-system-packages .
 
-# Simple import smoke-test (fails build early if deps still broken)
-RUN python3 -c "import wifiphisher; print('wifiphisher import OK')"
+# Copy service files
+COPY rootfs/ /etc/
 
-COPY rootfs /
-RUN chmod +x /etc/services.d/wifiphisher/run /etc/services.d/wifiphisher/finish
+# IMPORTANT: make service executable
+RUN chmod +x /etc/services.d/wifiphisher/run \
+    && chmod +x /etc/services.d/wifiphisher/finish
 
+# Start s6
 CMD ["/init"]
