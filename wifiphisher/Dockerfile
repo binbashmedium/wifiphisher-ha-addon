@@ -1,11 +1,15 @@
 FROM alpine:3.19
 
 RUN apk add --no-cache \
-  python3 py3-pip git bash jq iw wireless-tools iproute2 tcpdump net-tools \
-  libffi-dev openssl-dev build-base curl tar xz
+  python3 py3-pip git bash jq \
+  iw wireless-tools iproute2 tcpdump net-tools \
+  libffi-dev openssl-dev build-base \
+  curl tar xz \
+  dnsmasq hostapd iptables \
+  psmisc procps util-linux
 
 # Install s6-overlay (fixed version)
-# Asset names are "x86_64" and "aarch64" (not "amd64"/"arm64")
+# Asset names are "x86_64" and "aarch64"
 ENV S6_OVERLAY_VERSION=3.2.1.0
 
 RUN set -eux; \
