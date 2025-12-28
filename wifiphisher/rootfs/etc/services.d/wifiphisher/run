@@ -1,17 +1,18 @@
 #!/usr/bin/with-contenv bash
-set -euo pipefail
+set -e
 
-OPTIONS="/data/options.json"
-IFACE="wlan0"
-EXTRA_ARGS=""
+echo "[wifiphisher] starting..."
 
-if [ -f "$OPTIONS" ]; then
-  IFACE="$(jq -r '.interface // "wlan0"' "$OPTIONS")"
-  EXTRA_ARGS="$(jq -r '.args // ""' "$OPTIONS")"
-fi
+# Falls Interface nicht gesetzt ist
+IFACE="${INTERFACE:-wlan0}"
 
-echo "[wifiphisher] interface=$IFACE"
-echo "[wifiphisher] args=$EXTRA_ARGS"
+# Warten bis Interface existiert (wichtig!)
+while ! ip link show "$IFACE" >/dev/null 2>&1; do
+  echo "[wifiphisher] waiting for interface $IFACE..."
+  sleep 2
+done
 
-read -r -a EXTRA_ARR <<< "${EXTRA_ARGS:-}"
-exec wifiphisher --interface "$IFACE" "${EXTRA_ARR[@]}"
+echo "[wifiphisher] using interface: $IFACE"
+
+# Starte wifiphisher im Vordergrund (wichtig!)
+exec wifiphisher --interface "$IFACE"
