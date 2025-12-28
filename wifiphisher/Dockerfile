@@ -41,10 +41,14 @@ RUN git clone https://github.com/wifiphisher/wifiphisher.git /opt/wifiphisher \
   && cd /opt/wifiphisher \
   && pip3 install --break-system-packages .
 
-# Simple import smoke-test (fails build early if deps still broken)
+# Simple import check
 RUN python3 -c "import wifiphisher; print('wifiphisher import OK')"
 
-COPY rootfs /
-RUN chmod +x /etc/services.d/wifiphisher/run /etc/services.d/wifiphisher/finish
+COPY rootfs/ /
 
-CMD ["/init"]
+# Ensure s6 service scripts are executable (FIXED PATHS)
+RUN chmod +x /etc/services.d/wifiphisher/run \
+ && chmod +x /etc/services.d/wifiphisher/finish
+
+# IMPORTANT: use ENTRYPOINT so /init is always PID 1 (CMD can be overridden)
+ENTRYPOINT ["/init"]
