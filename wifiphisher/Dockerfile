@@ -6,10 +6,10 @@ RUN apk add --no-cache \
   libffi-dev openssl-dev build-base \
   curl tar xz \
   dnsmasq hostapd iptables \
-  psmisc procps util-linux
+  psmisc procps util-linux \
+  libnl3 libnl3-dev
 
 # Install s6-overlay (fixed version)
-# Asset names are "x86_64" and "aarch64"
 ENV S6_OVERLAY_VERSION=3.2.1.0
 
 RUN set -eux; \
@@ -28,7 +28,7 @@ RUN set -eux; \
   rm -f /tmp/s6-noarch.tar.xz /tmp/s6-arch.tar.xz; \
   test -x /init
 
-# Clone + install wifiphisher
+# Install wifiphisher
 WORKDIR /opt
 RUN git clone https://github.com/wifiphisher/wifiphisher.git /opt/wifiphisher \
   && cd /opt/wifiphisher \
