@@ -28,7 +28,7 @@ RUN set -eux; \
 WORKDIR /opt
 RUN git clone https://github.com/wifiphisher/wifiphisher.git /opt/wifiphisher \
   && cd /opt/wifiphisher \
-  && pip3 install .
+  && pip3 install --break-system-packages .
 
 COPY rootfs /
 RUN chmod +x /etc/services.d/wifiphisher/run /etc/services.d/wifiphisher/finish
